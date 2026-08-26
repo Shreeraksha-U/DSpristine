@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DSPristine · Retention Radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="topbar__mark">DS</span>
+      <div class="topbar__title">
+        <strong>Retention Radar</strong>
+        <span>DSPristine HRMS &middot; predictive attrition module</span>
+      </div>
+    </div>
+    <nav class="topbar__nav" aria-label="Primary">
+      <button class="navtab is-active" data-tab="overview">Overview</button>
+      <button class="navtab" data-tab="predict">Predict</button>
+      <button class="navtab" data-tab="atrisk">At-Risk List</button>
+    </nav>
+    <div class="topbar__status" id="modelStatus">
+      <span class="dot"></span> <span id="modelStatusText">connecting…</span>
+    </div>
+  </header>
+
+  <main class="app">
+
+    <!-- ============================ OVERVIEW ============================ -->
+    <section class="tabpanel is-active" id="tab-overview">
+      <div class="panel-head">
+        <h1>Workforce attrition, at a glance</h1>
+        <p>Historical signal from DSPristine employee records, summarized for HR leadership.</p>
+      </div>
+
+      <div class="kpi-row" id="kpiRow">
+        <div class="kpi-card"><span class="kpi-label">Employees analyzed</span><span class="kpi-value" id="kpiTotal">—</span></div>
+        <div class="kpi-card"><span class="kpi-label">Overall attrition rate</span><span class="kpi-value" id="kpiRate">—</span></div>
+        <div class="kpi-card"><span class="kpi-label">Model ROC-AUC</span><span class="kpi-value" id="kpiAuc">—</span></div>
+        <div class="kpi-card"><span class="kpi-label">Model in production</span><span class="kpi-value" id="kpiModel">—</span></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>Attrition rate by department</h2>
+          <canvas id="chartDept" height="220"></canvas>
+        </div>
+        <div class="card">
+          <h2>Attrition rate by overtime status</h2>
+          <canvas id="chartOvertime" height="220"></canvas>
+        </div>
+        <div class="card">
+          <h2>Attrition rate by monthly income band</h2>
+          <canvas id="chartIncome" height="220"></canvas>
+        </div>
+        <div class="card">
+          <h2>Attrition rate by job satisfaction (1–4)</h2>
+          <canvas id="chartSatisfaction" height="220"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Top drivers of attrition</h2>
+        <p class="card__sub">Feature importance from the production model — what the model actually weighs most when predicting risk.</p>
+        <canvas id="chartImportance" height="260"></canvas>
+      </div>
+    </section>
+
+    <!-- ============================ PREDICT ============================ -->
+    <section class="tabpanel" id="tab-predict">
+      <div class="panel-head">
+        <h1>Predict an employee's retention risk</h1>
+        <p>Enter an employee profile to get a Stay / Leave prediction with a probability score.</p>
+      </div>
+
+      <div class="predict-layout">
+        <form class="card form-card" id="predictForm">
+          <h2>Employee profile</h2>
+
+          <div class="form-grid">
+            <label>Age
+              <input type="number" name="Age" min="18" max="65" value="30" required />
+            </label>
+            <label>Marital status
+              <select name="MaritalStatus" required></select>
+            </label>
+            <label>Distance from home (km)
+              <input type="number" name="DistanceFromHome" min="1" max="60" value="8" required />
+            </label>
+            <label>Department
+              <select name="Department" required></select>
+            </label>
+            <label>Job role
+              <select name="JobRole" required></select>
+            </label>
+            <label>Education field
+              <select name="EducationField" required></select>
+            </label>
+            <label>Business travel
+              <select name="BusinessTravel" required></select>
+            </label>
+            <label>Overtime
+              <select name="OverTime" required></select>
+            </label>
+            <label>Job satisfaction (1–4)
+              <input type="number" name="JobSatisfaction" min="1" max="4" value="3" required />
+            </label>
+            <label>Environment satisfaction (1–4)
+              <input type="number" name="EnvironmentSatisfaction" min="1" max="4" value="3" required />
+            </label>
+            <label>Work-life balance (1–4)
+              <input type="number" name="WorkLifeBalance" min="1" max="4" value="3" required />
+            </label>
+            <label>Years at company
+              <input type="number" name="YearsAtCompany" min="0" max="40" value="3" required />
+            </label>
+            <label>Years since last promotion
+              <input type="number" name="YearsSinceLastPromotion" min="0" max="40" value="1" required />
+            </label>
+            <label>Trainings last year
+              <input type="number" name="TrainingTimesLastYear" min="0" max="10" value="2" required />
+            </label>
+            <label>Monthly income (₹)
+              <input type="number" name="MonthlyIncome" min="10000" max="500000" step="1000" value="45000" required />
+            </label>
+            <label>Percent salary hike
+              <input type="number" name="PercentSalaryHike" min="0" max="50" value="14" required />
+            </label>
+            <label>Companies worked previously
+              <input type="number" name="NumCompaniesWorked" min="0" max="15" value="1" required />
+            </label>
+          </div>
+
+          <button type="submit" class="btn-primary">Run prediction</button>
+        </form>
+
+        <div class="card result-card" id="resultCard">
+          <h2>Prediction</h2>
+          <div class="gauge-wrap">
+            <svg viewBox="0 0 200 120" class="gauge">
+              <path class="gauge__track" d="M20,110 A80,80 0 0 1 180,110" />
+              <path class="gauge__fill" id="gaugeFill" d="M20,110 A80,80 0 0 1 180,110" />
+            </svg>
+            <div class="gauge__value">
+              <span id="gaugeLabel">—</span>
+              <small id="gaugePct">Run a prediction to see results</small>
+            </div>
+          </div>
+          <dl class="result-meta">
+            <div><dt>Predicted outcome</dt><dd id="resultOutcome">—</dd></div>
+            <div><dt>Leave probability</dt><dd id="resultLeaveProb">—</dd></div>
+            <div><dt>Risk band</dt><dd id="resultBand">—</dd></div>
+            <div><dt>Model used</dt><dd id="resultModel">—</dd></div>
+          </dl>
+          <p class="result-hint" id="resultHint">Fill in the profile and run a prediction to see the retention outlook here.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ AT-RISK ============================ -->
+    <section class="tabpanel" id="tab-atrisk">
+      <div class="panel-head">
+        <h1>Current at-risk employees</h1>
+        <p>Active employees ranked by predicted leave probability — the model's shortlist for proactive HR outreach.</p>
+      </div>
+
+      <div class="card">
+        <div class="table-toolbar">
+          <input type="search" id="atRiskSearch" placeholder="Search by employee ID, department or role…" />
+          <span class="table-count" id="atRiskCount"></span>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Employee ID</th>
+                <th>Department</th>
+                <th>Job role</th>
+                <th>Age</th>
+                <th>Tenure (yrs)</th>
+                <th>Monthly income</th>
+                <th>Overtime</th>
+                <th>Leave risk</th>
+              </tr>
+            </thead>
+            <tbody id="atRiskBody">
+              <tr><td colspan="8" class="table-empty">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    Built for Dyashin Technosoft Pvt Ltd &middot; DSPristine HRMS &middot; synthetic demo data, not real employee records.
+  </footer>
+
+  <script src="js/vendor/chart.umd.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/predict.js"></script>
+  <script src="js/atrisk.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

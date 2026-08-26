@@ -1,0 +1,27 @@
+# --- secrets ---
+.env
+*.env
+!.env.example
+
+# --- python ---
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+
+# --- generated model / data artifacts (regenerated on first run) ---
+backend/model/*.joblib
+backend/model/metadata.json
+backend/data/employees.csv
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- logs ---
+*.log
