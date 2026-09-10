@@ -90,13 +90,6 @@ python train_model.py     # retrain Decision Tree + Random Forest
 | GET    | `/api/eda`                  | Aggregated attrition stats for charts     |
 | GET    | `/api/at-risk?limit=40`     | Ranked list of at-risk active employees   |
 
-## Design
-
-Strict 3-color system: `#1F1A69` (brand blue), white, and a light neutral
-mist gray. Every other tone in the UI is an opacity tint of those three —
-no additional hues are introduced anywhere, including risk indicators
-(shown as blue intensity meters and gauges rather than red/amber/green).
-Cards use no colored accent border; separation comes from elevation only.
 
 ## Note on data
 
