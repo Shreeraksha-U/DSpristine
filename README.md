@@ -98,7 +98,7 @@ DSPristine or Dyashin Technosoft employee information is used, stored, or
 required to run this project.
 
 ## Note on models
-train_model.py trains both a Decision Tree and a Random Forest on the same data, evaluates each (accuracy, precision, recall, F1, ROC-AUC), and saves both as .joblib files plus a metadata.json recording both sets of metrics.
+train_model.py trains both a Decision Tree and a Random Forest on the same data of over 1,500 records, evaluates each (accuracy, precision, recall, F1, ROC-AUC), and saves both as .joblib files plus a metadata.json recording both sets of metrics.
 Whichever scored higher ROC-AUC is marked the "production" model. Currently that's the Random Forest (~0.71 ROC-AUC vs. the Decision Tree's ~0.60).
 The Flask app (app.py) loads just one of them at startup, controlled by the MODEL_TYPE variable in .env file (random_forest or decision_tree). That single model is what actually answers every /api/predict call, powers the At-Risk list, and drives the feature-importance chart.
 
